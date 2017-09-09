@@ -2,10 +2,12 @@ import Vue from 'vue'
 
 export const state = () => ({
   ship: {
+    tier: 0.25,
     frame: null,
     cores: null,
     thruster: null,
-    armor: null
+    armor: null,
+    computer: null
   }
 })
 
@@ -41,7 +43,13 @@ export const mutations = {
   SET_CORE (state, { core, index }) {
     Vue.set(state.ship.cores, index, core)
   },
-  SET_ARMOR(state, armor) {
+  SET_ARMOR (state, armor) {
     state.ship.armor = armor
+  },
+  SET_TIER (state, tier) {
+    state.ship.tier = tier
+  },
+  SET_COMPUTER (state, computer) {
+    state.ship.computer = computer
   }
 }

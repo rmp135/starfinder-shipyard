@@ -3,10 +3,18 @@
 <template lang="pug">
   div
     component(:show="pickerComp !== null" :is="pickerComp")
-    label Pilot
-    input(type="number"  v-model.number="initialPilotSkill")
-    //- select(v-model="frameSelect")
-    //-   option(v-for="availableFrame in frames" :value="availableFrame.name") {{availableFrame.name}}
+    .section
+      div Pilot
+      input(type="number"  v-model.number="initialPilotSkill")
+      div Tier
+      select(v-model.number="chosenTier")
+        option(v-for="tier in tiers") {{tier}}
+      div Available Build Points: {{availableBuildPoints}} / {{maxBuildPoints}}
+      section(v-if="ship.frame !== null")
+        div HP: {{maxHP}}
+        div Maneuverability: {{ship.frame.maneuverability}} (turn {{turnDistanceTotal}})
+        div Piloting Check Bonus: {{pilotCheckTotal}}
+        div Target Lock: {{targetLockTotal}}
     .section
       h2.title Frame
       stat-block(:item="ship.frame" :type="'frame'" :onPick="onPick.bind(this, 'frame')")
@@ -16,54 +24,108 @@
           div Maneuverability: {{props.item.maneuverability}}
           div Max HP: {{props.item.hp.max}}
           div HP Increment: {{props.item.increment}}
-          //- div Damage Threshold 
-    div(v-if="ship.frame !== null")
-      div HP: {{ship.frame.hp.max}}
-      div Maneuverability: {{ship.frame.maneuverability.name}} (turn {{turnDistanceTotal}})
-      div Piloting Check: {{pilotCheckTotal}}
-      div Target Lock: {{targetLockTotal}}
+    template(v-if="ship.frame !== null")
       .section
         h2.title Cores
-        div Available PCU: {{availablePCU}}
         stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)")
           template(slot="title" scope="props") {{props.item.name}}
           template(slot="details" scope="props")
             div PCU: {{props.item.pcu}}
             div Cost: {{props.item.cost}}
       .section
-        h2.title Thrusters
-        stat-block(:item="ship.thruster" :type="'thruster'" :onPick="onPick.bind(this, 'thruster')")
-          template(slot="title" scope="props") {{props.item.name}}
-          template(slot="details" scope="props")
-            div Speed: {{props.item.speed}}
-            div PCU: {{props.item.pcu}}
-            div Cost: {{props.item.cost}}
-      .section
-        h2.title Armor
-        stat-block(:item="ship.armor" :type="'armor'" :onPick="onPick.bind(this, 'armor')")
-          template(slot="title" scope="props") {{props.item.name}}
-          template(slot="details" scope="props")
-            div Bonus to AC: {{props.item.ac}}
-            div Target Lock: {{props.item.targetLock}}
-            div Turn Distance: {{props.item.turnDistance}}
-            div Cost: {{armorCost(ship.frame, props.item)}}
+        .columns
+          .column
+            h2.title Thrusters
+            stat-block(:item="ship.thruster" :type="'thruster'" :onPick="onPick.bind(this, 'thruster')")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div Speed: {{props.item.speed}}
+                div PCU: {{props.item.pcu}}
+                div Cost: {{props.item.cost}}
+          .column
+            h2.title Armor
+            stat-block(:item="ship.armor" :type="'armor'" :onPick="onPick.bind(this, 'armor')")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div Bonus to AC: {{props.item.ac}}
+                div Target Lock: {{props.item.targetLock}}
+                div Turn Distance: {{props.item.turnDistance}}
+                div Cost: {{armorCost(ship.frame, props.item)}}
+          .column
+            h2.title Computer
+            stat-block(:item="ship.computer" :type="'computer'" :onPick="onPick.bind(this, 'computer')")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div Bonus to Combat Check: {{props.item.bonus}}
+                div Nodes: {{props.item.nodes}}
+                div PCU: {{props.item.pcu}}
+                div Cost: {{props.item.cost}}
 </template>
 <script>
   import PowerPicker from '~/components/power-picker'
   import ThrusterPicker from '~/components/thruster-picker'
   import ArmorPicker from '~/components/armor-picker'
   import FramePicker from '~/components/frame-picker'
+  import ComputerPicker from '~/components/computer-picker'
   import StatBlock from '~/components/stat-block'
   import Vue from 'vue'
   import { mapState, mapMutations, mapGetters } from 'vuex'
   export default {
     data: () => ({
       initialPilotSkill: 0,
+      tiers: [0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     }),
     computed: {
       ...mapState(['ship']),
       ...mapState('pickerModule', ['picker', 'pickerIndex']),
       ...mapGetters(['armorCost']),
+      maxBuildPoints () {
+        switch (this.ship.tier) {
+          case 0.25: return 25
+          case 0.5: return 30
+          case 1: return 55
+          case 2: return 75
+          case 3: return 95
+          case 4: return 115
+          case 5: return 135
+          case 6: return 155
+          case 7: return 180
+          case 8: return 205
+          case 9: return 230
+          case 10: return 270
+          case 11: return 310
+          case 12: return 350
+          case 13: return 400
+          case 14: return 450
+          case 15: return 500
+          case 16: return 600
+          case 17: return 700
+          case 18: return 800
+          case 19: return 900
+          case 20: return 1000
+        }
+      },
+      availableBuildPoints () {
+        let total = this.maxBuildPoints
+        total -= this.ship.frame !== null ? this.ship.frame.cost : 0
+        total -= this.ship.thruster !== null ? this.ship.thruster.cost : 0
+        total -= this.ship.computer !== null ? this.ship.computer.cost : 0
+        return total
+      },
+      maxHP () {
+        let total = 0
+        total += this.ship.frame.hp.max
+        total += this.ship.frame.hp.increment * Math.floor(this.ship.tier / 4)
+        return total
+      },
+      chosenTier: {
+        get () {
+          return this.ship.tier
+        },
+        set (value) {
+          this.setTier(value)
+        }
+      },
       availablePCU () {
         let total = this.ship.cores.map(c => c === null ? 0 : c.pcu).reduce(((c1, c2) => c1 + c2), 0)
         if (this.ship.thruster !== null) {
@@ -123,7 +185,7 @@
     },
     methods: {
       ...mapMutations({
-        'setFrame': 'SET_FRAME',
+        'setTier': 'SET_TIER',
         'setPicker': 'pickerModule/SET_PICKER',
         'setPickerIndex': 'pickerModule/SET_PICKER_INDEX'
       }),
@@ -137,7 +199,8 @@
       ThrusterPicker,
       ArmorPicker,
       StatBlock,
-      FramePicker
+      FramePicker,
+      ComputerPicker
     }
   }
 </script>

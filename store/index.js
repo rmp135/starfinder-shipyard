@@ -7,7 +7,8 @@ export const state = () => ({
     cores: null,
     thruster: null,
     armor: null,
-    computer: null
+    computer: null,
+    crewQuarters: null
   }
 })
 
@@ -47,9 +48,13 @@ export const mutations = {
     state.ship.armor = armor
   },
   SET_TIER (state, tier) {
+    state.ship.computer = null
     state.ship.tier = tier
   },
   SET_COMPUTER (state, computer) {
     state.ship.computer = computer
+  },
+  SET_CREW (state, crewQuarters) {
+    state.ship.crewQuarters = crewQuarters
   }
 }

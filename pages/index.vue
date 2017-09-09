@@ -10,11 +10,22 @@
       select(v-model.number="chosenTier")
         option(v-for="tier in tiers") {{tier}}
       div Available Build Points: {{availableBuildPoints}} / {{maxBuildPoints}}
-      section(v-if="ship.frame !== null")
-        div HP: {{maxHP}}
-        div Maneuverability: {{ship.frame.maneuverability}} (turn {{turnDistanceTotal}})
-        div Piloting Check Bonus: {{pilotCheckTotal}}
-        div Target Lock: {{targetLockTotal}}
+      .section(v-if="ship.frame !== null")
+        .columns
+          .column
+            div HP: {{maxHP}}
+            div Maneuverability: {{ship.frame.maneuverability}} (turn {{turnDistanceTotal}})
+            div Piloting Check Bonus: {{pilotCheckTotal}}
+            div Target Lock: {{targetLockTotal}}
+            div Total AC: {{totalAC}}
+          .column
+            div Back Off: DC{{stuntChecks.easy}}
+            div Barrel Roll: DC{{stuntChecks.easy}}
+            div Evade: DC{{stuntChecks.easy}}
+            div Flip and Burn: DC{{stuntChecks.medium}}
+            div Flyby: DC{{stuntChecks.hard}}
+            div Slide: DC{{stuntChecks.easy}}
+        
     .section
       h2.title Frame
       stat-block(:item="ship.frame" :type="'frame'" :onPick="onPick.bind(this, 'frame')")
@@ -60,6 +71,13 @@
                 div Nodes: {{props.item.nodes}}
                 div PCU: {{props.item.pcu}}
                 div Cost: {{props.item.cost}}
+    .section(v-if="hasCrewQuarters")
+      h2.title Crew Quarters
+      stat-block(:item="ship.crewQuarters" :type="'crew quarters'" :onPick="onPick.bind(this, 'crew')")
+        template(slot="title" scope="props") Quality: {{props.item.name}}
+        template(slot="details" scope="props")
+          div Cost: {{props.item.cost}}
+
 </template>
 <script>
   import PowerPicker from '~/components/power-picker'
@@ -67,6 +85,7 @@
   import ArmorPicker from '~/components/armor-picker'
   import FramePicker from '~/components/frame-picker'
   import ComputerPicker from '~/components/computer-picker'
+  import CrewPicker from '~/components/crew-picker'
   import StatBlock from '~/components/stat-block'
   import Vue from 'vue'
   import { mapState, mapMutations, mapGetters } from 'vuex'
@@ -79,6 +98,13 @@
       ...mapState(['ship']),
       ...mapState('pickerModule', ['picker', 'pickerIndex']),
       ...mapGetters(['armorCost']),
+      stuntChecks () {
+        return {
+          easy: Math.floor(10 + 2 * this.ship.tier),
+          medium: Math.floor(15 + 2 * this.ship.tier),
+          hard: Math.floor(20 + 2 * this.ship.tier),
+        }
+      },
       maxBuildPoints () {
         switch (this.ship.tier) {
           case 0.25: return 25
@@ -105,11 +131,15 @@
           case 20: return 1000
         }
       },
+      hasCrewQuarters () {
+        return this.ship.frame !== null && this.ship.frame.size !== "tiny"
+      },
       availableBuildPoints () {
         let total = this.maxBuildPoints
         total -= this.ship.frame !== null ? this.ship.frame.cost : 0
         total -= this.ship.thruster !== null ? this.ship.thruster.cost : 0
         total -= this.ship.computer !== null ? this.ship.computer.cost : 0
+        total -= this.ship.crewQuarters !== null ? this.ship.crewQuarters.cost : 0
         return total
       },
       maxHP () {
@@ -117,6 +147,25 @@
         total += this.ship.frame.hp.max
         total += this.ship.frame.hp.increment * Math.floor(this.ship.tier / 4)
         return total
+      },
+      totalAC () {
+        let total = 10
+        total += this.initialPilotSkill
+        total += this.ship.armor !== null ? this.ship.armor.ac : 0
+        total += this.frameBonus !== null ? this.frameBonus : 0
+        return total
+      },
+      frameBonus () {
+        if (this.ship.frame === null) return null
+        switch (this.ship.frame.size) {
+          case 'tiny': return 2
+          case 'small': return 1
+          case 'medium': return 0
+          case 'large': return -1
+          case 'huge': return -2
+          case 'gargantuan': return -4
+          case 'colossal': return -8
+        }
       },
       chosenTier: {
         get () {
@@ -200,7 +249,8 @@
       ArmorPicker,
       StatBlock,
       FramePicker,
-      ComputerPicker
+      ComputerPicker,
+      CrewPicker
     }
   }
 </script>

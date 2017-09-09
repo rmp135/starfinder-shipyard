@@ -5,8 +5,18 @@
     component(:show="pickerComp !== null" :is="pickerComp")
     label Pilot
     input(type="number"  v-model.number="initialPilotSkill")
-    select(v-model="frameSelect")
-      option(v-for="availableFrame in frames" :value="availableFrame.name") {{availableFrame.name}}
+    //- select(v-model="frameSelect")
+    //-   option(v-for="availableFrame in frames" :value="availableFrame.name") {{availableFrame.name}}
+    .section
+      h2.title Frame
+      stat-block(:item="ship.frame" :type="'frame'" :onPick="onPick.bind(this, 'frame')")
+        template(slot="title" scope="props") {{props.item.name}}
+        template(slot="details" scope="props")
+          div Size: {{props.item.size}}
+          div Maneuverability: {{props.item.maneuverability}}
+          div Max HP: {{props.item.hp.max}}
+          div HP Increment: {{props.item.increment}}
+          //- div Damage Threshold 
     div(v-if="ship.frame !== null")
       div HP: {{ship.frame.hp.max}}
       div Maneuverability: {{ship.frame.maneuverability.name}} (turn {{turnDistanceTotal}})
@@ -42,27 +52,18 @@
   import PowerPicker from '~/components/power-picker'
   import ThrusterPicker from '~/components/thruster-picker'
   import ArmorPicker from '~/components/armor-picker'
+  import FramePicker from '~/components/frame-picker'
   import StatBlock from '~/components/stat-block'
-  import frames from '~/data/frames'
   import Vue from 'vue'
   import { mapState, mapMutations, mapGetters } from 'vuex'
   export default {
     data: () => ({
-      frames,
       initialPilotSkill: 0,
     }),
     computed: {
       ...mapState(['ship']),
       ...mapState('pickerModule', ['picker', 'pickerIndex']),
       ...mapGetters(['armorCost']),
-      frameSelect: {
-        get () {
-          return this.ship.frame === null ? null : this.ship.frame.name
-        },
-        set (value) {
-          this.setFrame(this.frames.find(f => f.name === value))
-        }
-      },
       availablePCU () {
         let total = this.ship.cores.map(c => c === null ? 0 : c.pcu).reduce(((c1, c2) => c1 + c2), 0)
         if (this.ship.thruster !== null) {
@@ -135,7 +136,8 @@
       PowerPicker,
       ThrusterPicker,
       ArmorPicker,
-      StatBlock
+      StatBlock,
+      FramePicker
     }
   }
 </script>

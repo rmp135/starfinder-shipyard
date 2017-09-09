@@ -7,7 +7,7 @@ export default [
       max: 20,
       increment: 5
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: [
         {
@@ -44,7 +44,7 @@ export default [
       max: 30,
       increment: 5
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: [
         {
@@ -72,7 +72,7 @@ export default [
       max: 35,
       increment: 5
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: 
       [
@@ -101,7 +101,7 @@ export default [
       max: 35,
       increment: 5
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: 
       [
@@ -130,7 +130,7 @@ export default [
       max: 40,
       increment: 10
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: 
       [
@@ -169,7 +169,7 @@ export default [
       max: 55,
       increment: 10
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: 
       [
@@ -208,7 +208,7 @@ export default [
       max: 70,
       increment: 15
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: 
       [
@@ -246,7 +246,7 @@ export default [
       max: 150,
       increment: 20
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: 
       [
@@ -299,7 +299,7 @@ export default [
       max: 120,
       increment: 20
     },
-    damageThreshold: null,
+    damageThreshold: 0,
     mounts: {
       forward: 
       [

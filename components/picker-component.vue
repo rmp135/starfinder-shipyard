@@ -22,13 +22,31 @@
   }
 </style>
 <template lang="pug">
-  .picker
-    div(v-for="item in list")
-      .item(:class="{inValid: !isValid(item), selected: selectedItem === item}" @click="selectedItem = item")
-        slot(name="title" :item="item")
-    div(v-if="selectedItem !== null")
-      slot(name="details" :item="selectedItem")
-    button(@click="onDone" :disabled="!canContinue") Done
+  .picker.modal.is-active
+    .modal-background
+    .modal-content
+      .modal-card
+        header.modal-card-head
+          p.modal-card-title Hello
+        section.modal-card-body
+          .columns
+            .column.is-one-quarter
+              div(v-for="item in list")
+                .item(:class="{inValid: !isValid(item), selected: selectedItem === item}" @click="selectedItem = item")
+                  slot(name="title" :item="item")
+            .column
+              div(v-if="selectedItem !== null")
+                slot(name="details" :item="selectedItem")
+        footer.modal-card-foot
+          button.button.is-success(@click="onDone" :disabled="!canContinue") Done
+
+  //- .picker
+  //-   div(v-for="item in list")
+  //-     .item(:class="{inValid: !isValid(item), selected: selectedItem === item}" @click="selectedItem = item")
+  //-       slot(name="title" :item="item")
+  //-   div(v-if="selectedItem !== null")
+  //-     slot(name="details" :item="selectedItem")
+  //-   button(@click="onDone" :disabled="!canContinue") Done
 </template>
 <script>
   import { mapMutations } from 'vuex'
@@ -39,7 +57,7 @@
     }),
     computed: {
       canContinue () {
-        this.selectedItem !== null && this.isValid(this.selectedItem)
+        return this.selectedItem !== null && this.isValid(this.selectedItem)
       }
     },
     methods: {

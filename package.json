@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bulma": "^0.5.1",
     "node-sass": "^4.5.3",
     "nuxt": "^1.0.0-rc8",
     "pug": "^2.0.0-rc.3",

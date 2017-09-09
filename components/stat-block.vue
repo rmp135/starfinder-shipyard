@@ -1,0 +1,19 @@
+<template lang="pug">
+  .card
+    div(v-if="item !== null")
+      header.card-header
+          p.card-header-title
+            slot(name="title" :item="item") {{item.title}}
+      .card-content
+        slot.content(:item="item" name="details")
+    div(v-else)
+      .card-content
+        .content No {{type}} selected.
+    footer.card-footer
+      a.card-footer-item(@click="onPick") Pick a {{type}}
+</template>
+<script>
+  export default {
+    props: ["item", "type", "onPick"]
+  }
+</script>

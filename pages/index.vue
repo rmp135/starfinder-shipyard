@@ -1,19 +1,8 @@
 <style lang="scss">
-  .block {
-    padding: 1rem;
-    border: red solid;
-    border-radius: 1rem;
-    a {
-      cursor: pointer;
-    }
-  }
-
-  .section {
-    display: flex;
-  }
 </style>
 <template lang="pug">
   div
+    component(:show="pickerComp !== null" :is="pickerComp")
     label Pilot
     input(type="number"  v-model.number="initialPilotSkill")
     select(v-model="frameSelect")
@@ -23,33 +12,28 @@
       div Maneuverability: {{ship.frame.maneuverability.name}} (turn {{maneuverabilityDetails.turn}})
       div Piloting Check: {{pilotCheck}}
       .section
-        h2 Cores
+        h2.title Cores
         div Available PCU: {{availablePCU}}
-        .block(v-for="(core, index) in ship.cores")
-          div(v-if="core !== null")
-            div Name: {{core.name}}
-            div PCU: {{core.pcu}}
-            div Cost: {{core.cost}}
-          div(v-else)
-            span No core selected.
-          a(@click="onPick('power', index)") Pick a core
+        stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)")
+          template(slot="title" scope="props") {{props.item.name}}
+          template(slot="details" scope="props")
+            div PCU: {{props.item.pcu}}
+            div Cost: {{props.item.cost}}
       .section
-        h2 Thrusters
-        .block
-          div(v-if="ship.thruster !== null")
-            div Name: {{ship.thruster.name}}
-            div Speed: {{ship.thruster.speed}}
-            div PCU: {{ship.thruster.pcu}}
-            div Cost: {{ship.thruster.cost}}
-          div(v-else)
-            span No thrusters selected.
-          a(@click="onPick('thruster')") Pick a thruster
-    component(:show="pickerComp !== null" :is="pickerComp")
+        h2.title Thrusters
+        stat-block(:item="ship.thruster" :type="'thruster'" :onPick="onPick.bind(this, 'thruster')")
+          template(slot="title" scope="props") {{props.item.name}}
+          template(slot="details" scope="props")
+            div Name: {{props.item.name}}
+            div Speed: {{props.item.speed}}
+            div PCU: {{props.item.pcu}}
+            div Cost: {{props.item.cost}}
 </template>
 <script>
   import PowerPicker from '~/components/power-picker'
   import ThrusterPicker from '~/components/thruster-picker'
   import PickerComp from '~/components/picker-component'
+  import StatBlock from '~/components/stat-block'
   import frames from '~/data/frames'
   import Vue from 'vue'
   import { mapState, mapMutations } from 'vuex'
@@ -130,6 +114,7 @@
       PickerComp,
       PowerPicker,
       ThrusterPicker,
+      StatBlock
     }
   }
 </script>

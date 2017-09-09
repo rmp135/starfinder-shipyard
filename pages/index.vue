@@ -9,7 +9,7 @@
       option(v-for="availableFrame in frames" :value="availableFrame.name") {{availableFrame.name}}
     div(v-if="ship.frame !== null")
       div HP: {{ship.frame.hp.max}}
-      div Maneuverability: {{ship.frame.maneuverability.name}} (turn {{maneuverabilityDetails.turn}})
+      div Maneuverability: {{ship.frame.maneuverability.name}} (turn {{turnDistanceTotal}})
       div Piloting Check: {{pilotCheckTotal}}
       div Target Lock: {{targetLockTotal}}
       .section
@@ -77,6 +77,12 @@
       targetLockTotal () {
         let total = 0
         total += this.ship.armor !== null ? this.ship.armor.targetLock : 0
+        return total
+      },
+      turnDistanceTotal () {
+        let total = 0
+        total += this.maneuverabilityDetails !== null ? this.maneuverabilityDetails.turn : 0
+        total += this.ship.armor !== null ? this.ship.armor.turnDistance : 0
         return total
       },
       maneuverabilityDetails () {

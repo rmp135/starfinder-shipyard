@@ -20,11 +20,9 @@
 </style>
 <template lang="pug">
   .picker.modal.is-active
-    .modal-background
+    .modal-background(@click="clearPicker")
     .modal-content
       .modal-card
-        header.modal-card-head
-          p.modal-card-title Hello
         section.modal-card-body
           .columns
             .column.is-one-quarter

@@ -74,7 +74,7 @@ export default [
     size: "medium",
     speed: 4,
     pcu: 40,
-    cost: 6
+    cost: 2
   },
   {
     name: "M6 thrusters",

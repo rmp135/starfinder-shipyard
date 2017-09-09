@@ -10,7 +10,8 @@
     div(v-if="ship.frame !== null")
       div HP: {{ship.frame.hp.max}}
       div Maneuverability: {{ship.frame.maneuverability.name}} (turn {{maneuverabilityDetails.turn}})
-      div Piloting Check: {{pilotCheck}}
+      div Piloting Check: {{pilotCheckTotal}}
+      div Target Lock: {{targetLockTotal}}
       .section
         h2.title Cores
         div Available PCU: {{availablePCU}}
@@ -24,19 +25,27 @@
         stat-block(:item="ship.thruster" :type="'thruster'" :onPick="onPick.bind(this, 'thruster')")
           template(slot="title" scope="props") {{props.item.name}}
           template(slot="details" scope="props")
-            div Name: {{props.item.name}}
             div Speed: {{props.item.speed}}
             div PCU: {{props.item.pcu}}
             div Cost: {{props.item.cost}}
+      .section
+        h2.title Armor
+        stat-block(:item="ship.armor" :type="'armor'" :onPick="onPick.bind(this, 'armor')")
+          template(slot="title" scope="props") {{props.item.name}}
+          template(slot="details" scope="props")
+            div Bonus to AC: {{props.item.ac}}
+            div Target Lock: {{props.item.targetLock}}
+            div Turn Distance: {{props.item.turnDistance}}
+            div Cost: {{armorCost(ship.frame, props.item)}}
 </template>
 <script>
   import PowerPicker from '~/components/power-picker'
   import ThrusterPicker from '~/components/thruster-picker'
-  import PickerComp from '~/components/picker-component'
+  import ArmorPicker from '~/components/armor-picker'
   import StatBlock from '~/components/stat-block'
   import frames from '~/data/frames'
   import Vue from 'vue'
-  import { mapState, mapMutations } from 'vuex'
+  import { mapState, mapMutations, mapGetters } from 'vuex'
   export default {
     data: () => ({
       frames,
@@ -45,6 +54,7 @@
     computed: {
       ...mapState(['ship']),
       ...mapState('pickerModule', ['picker', 'pickerIndex']),
+      ...mapGetters(['armorCost']),
       frameSelect: {
         get () {
           return this.ship.frame === null ? null : this.ship.frame.name
@@ -63,6 +73,11 @@
       pickerComp () {
         if (this.picker === null) return null
         return  `${this.picker}-picker`
+      },
+      targetLockTotal () {
+        let total = 0
+        total += this.ship.armor !== null ? this.ship.armor.targetLock : 0
+        return total
       },
       maneuverabilityDetails () {
         if (this.ship.frame === null) return null
@@ -84,7 +99,7 @@
             break
         }
       },
-      pilotCheck () {
+      pilotCheckTotal () {
         let check = this.initialPilotSkill
         let speed = 0
         if (this.maneuverabilityDetails !== null) {
@@ -111,9 +126,9 @@
       }
     },
     components: {
-      PickerComp,
       PowerPicker,
       ThrusterPicker,
+      ArmorPicker,
       StatBlock
     }
   }

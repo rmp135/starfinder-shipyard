@@ -10,9 +10,6 @@
     &.inValid {
       color: grey;
     }
-    &.selected {
-      background-color: green;
-    }
   }
   .dialog {
     background-color: red;
@@ -32,21 +29,13 @@
           .columns
             .column.is-one-quarter
               div(v-for="item in list")
-                .item(:class="{inValid: !isValid(item), selected: selectedItem === item}" @click="selectedItem = item")
+                .item(:class="{inValid: !isValid(item), 'has-text-primary': selectedItem === item}" @click="selectedItem = item")
                   slot(name="title" :item="item")
             .column
               div(v-if="selectedItem !== null")
                 slot(name="details" :item="selectedItem")
         footer.modal-card-foot
           button.button.is-success(@click="onDone" :disabled="!canContinue") Done
-
-  //- .picker
-  //-   div(v-for="item in list")
-  //-     .item(:class="{inValid: !isValid(item), selected: selectedItem === item}" @click="selectedItem = item")
-  //-       slot(name="title" :item="item")
-  //-   div(v-if="selectedItem !== null")
-  //-     slot(name="details" :item="selectedItem")
-  //-   button(@click="onDone" :disabled="!canContinue") Done
 </template>
 <script>
   import { mapMutations } from 'vuex'

@@ -10,7 +10,7 @@
       .card-content
         .content No {{type}} selected.
     footer.card-footer
-      a.card-footer-item(@click="onPick") Pick a {{type}}
+      a.card-footer-item(@click="onPick") Pick {{type}}
 </template>
 <script>
   export default {

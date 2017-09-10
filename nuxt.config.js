@@ -6,6 +6,6 @@ module.exports = {
     dir: 'docs'
   },
   router: {
-    base: '/starfinder-shipyard/'
+    base: '/'
   }
 }

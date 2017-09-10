@@ -9,6 +9,7 @@
       div Max HP: {{props.item.hp.max}}
       div HP Increment: {{props.item.hp.increment}}
       div Damage Threshold: {{props.item.damageThreshold}}
+      div Expansion Bays: {{props.item.expansionBays}}
 </template>
 <script>
   import frames from '~/data/frames'

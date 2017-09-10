@@ -4,11 +4,13 @@ export const state = () => ({
   ship: {
     tier: 0.25,
     frame: null,
-    cores: null,
+    cores: [],
     thruster: null,
     armor: null,
     computer: null,
-    crewQuarters: null
+    defenses: null,
+    crewQuarters: null,
+    bays: []
   }
 })
 
@@ -34,8 +36,12 @@ export const mutations = {
     state.ship.frame = frame
     state.ship.thruster = null
     state.ship.cores = []
-    for (var i = 0; i < 1; i++) {
-      state.ship.cores.push(null)
+    state.ship.cores.push(null)
+    state.ship.bays = []
+    if (frame !== null) {
+      for (var i = 0; i < frame.expansionBays; i++) {
+        state.ship.bays.push(null)
+      }
     }
   },
   SET_THRUSTER (state, thruster) {
@@ -43,6 +49,12 @@ export const mutations = {
   },
   SET_CORE (state, { core, index }) {
     Vue.set(state.ship.cores, index, core)
+  },
+  REMOVE_CORE (state, index) {
+    state.ship.cores.splice(index, 1)
+  },
+  ADD_CORE (state) {
+    state.ship.cores.push(null)
   },
   SET_ARMOR (state, armor) {
     state.ship.armor = armor
@@ -56,5 +68,26 @@ export const mutations = {
   },
   SET_CREW (state, crewQuarters) {
     state.ship.crewQuarters = crewQuarters
+  },
+  SET_DEFENSES (state, defenses) {
+    state.ship.defenses = defenses
+  },
+  SET_BAY (state, { bay, index }) {
+    Vue.set(state.ship.bays, index, bay)
+  }
+}
+  
+export const actions = {
+  clearBay ({ state, commit }, index) {
+    if (state.ship.bays[index].name === "Power Core Housing") {
+      commit('REMOVE_CORE', index)
+    }
+    commit('SET_BAY', { bay: null, index })
+  },
+  setBay ({ state, commit }, { bay, index }) {
+    if (bay.name === "Power Core Housing") {
+      commit('ADD_CORE')
+    }
+    commit('SET_BAY', { bay, index })
   }
 }

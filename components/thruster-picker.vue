@@ -3,6 +3,7 @@
     template(slot="title" scope="props") {{props.item.name}}
     template(slot="details" scope="props")
       h2 {{props.item.name}}
+      div Speed: {{props.item.speed}}
       div PCU: {{props.item.pcu}}
       div Cost: {{props.item.cost}}
 </template>

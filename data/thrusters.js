@@ -51,9 +51,9 @@ export default [
   {
     name: "S8 thrusters",
     size: "small",
-    speed: 6,
-    pcu: 30,
-    cost: 3
+    speed: 8,
+    pcu: 40,
+    cost: 4
   },
   {
     name: "S10 thrusters",

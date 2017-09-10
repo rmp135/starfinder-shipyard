@@ -25,7 +25,7 @@
         'setComputer': 'SET_COMPUTER',
       }),
       isValid (computer) {
-        return computer.bonus === Math.max(this.ship.tier, 1)
+        return computer.bonus === Math.max(this.ship.tier, 1) || computer.bonus === 0
       },
       onDoneClick (computer) {
         this.setComputer(JSON.parse(JSON.stringify(computer)))

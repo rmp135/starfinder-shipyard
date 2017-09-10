@@ -4,13 +4,12 @@
   div
     component(:show="pickerComp !== null" :is="pickerComp")
     .section
-      div Pilot
-      input(type="number"  v-model.number="initialPilotSkill")
-      div Tier
-      select(v-model.number="chosenTier")
-        option(v-for="tier in tiers") {{tier}}
-      div Available Build Points: {{availableBuildPoints}} / {{maxBuildPoints}}
       .section(v-if="ship.frame !== null")
+        div Pilot
+        input(type="number"  v-model.number="initialPilotSkill")
+        div Tier
+        select(v-model.number="chosenTier")
+          option(v-for="tier in tiers") {{tier}}
         .columns
           .column
             div HP: {{maxHP}}
@@ -18,6 +17,8 @@
             div Piloting Check Bonus: {{pilotCheckTotal}}
             div Target Lock: {{targetLockTotal}}
             div Total AC: {{totalAC}}
+            div Available Build Points: {{availableBuildPoints}} / {{maxBuildPoints}}
+            div Available PCU: {{availablePCU}} / {{maxPCU}}
           .column
             div Back Off: DC{{stuntChecks.easy}}
             div Barrel Roll: DC{{stuntChecks.easy}}
@@ -28,7 +29,7 @@
         
     .section
       h2.title Frame
-      stat-block(:item="ship.frame" :type="'frame'" :onPick="onPick.bind(this, 'frame')")
+      stat-block(:item="ship.frame" :type="'frame'" :onPick="onPick.bind(this, 'frame')" :onClear="setFrame.bind(this, null)")
         template(slot="title" scope="props") {{props.item.name}}
         template(slot="details" scope="props")
           div Size: {{props.item.size}}
@@ -38,7 +39,7 @@
     template(v-if="ship.frame !== null")
       .section
         h2.title Cores
-        stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)")
+        stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
           template(slot="title" scope="props") {{props.item.name}}
           template(slot="details" scope="props")
             div PCU: {{props.item.pcu}}
@@ -47,7 +48,7 @@
         .columns
           .column
             h2.title Thrusters
-            stat-block(:item="ship.thruster" :type="'thruster'" :onPick="onPick.bind(this, 'thruster')")
+            stat-block(:item="ship.thruster" :type="'thruster'" :onPick="onPick.bind(this, 'thruster')" :onClear="setThruster.bind(this, null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Speed: {{props.item.speed}}
@@ -55,7 +56,7 @@
                 div Cost: {{props.item.cost}}
           .column
             h2.title Armor
-            stat-block(:item="ship.armor" :type="'armor'" :onPick="onPick.bind(this, 'armor')")
+            stat-block(:item="ship.armor" :type="'armor'" :onPick="onPick.bind(this, 'armor')" :onClear="setArmor.bind(this, null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Bonus to AC: {{props.item.ac}}
@@ -64,19 +65,35 @@
                 div Cost: {{armorCost(ship.frame, props.item)}}
           .column
             h2.title Computer
-            stat-block(:item="ship.computer" :type="'computer'" :onPick="onPick.bind(this, 'computer')")
+            stat-block(:item="ship.computer" :type="'computer'" :onPick="onPick.bind(this, 'computer')" :onClear="setComputer.bind(this, null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Bonus to Combat Check: {{props.item.bonus}}
                 div Nodes: {{props.item.nodes}}
                 div PCU: {{props.item.pcu}}
                 div Cost: {{props.item.cost}}
-    .section(v-if="hasCrewQuarters")
-      h2.title Crew Quarters
-      stat-block(:item="ship.crewQuarters" :type="'crew quarters'" :onPick="onPick.bind(this, 'crew')")
-        template(slot="title" scope="props") Quality: {{props.item.name}}
-        template(slot="details" scope="props")
-          div Cost: {{props.item.cost}}
+          .column
+            h2.title Defenses
+            stat-block(:item="ship.defenses" :type="'defensive countermeasures'" :onPick="onPick.bind(this, 'defenses')" :onClear="setDefenses.bind(this, null)")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div Cost: {{props.item.cost}}
+                div PCU: {{props.item.pcu}}
+                div TL Bonus: {{props.item.tl}}
+      .section(v-if="hasCrewQuarters")
+        h2.title Crew Quarters
+        stat-block(:item="ship.crewQuarters" :type="'crew quarters'" :onPick="onPick.bind(this, 'crew')" :onClear="setCrew.bind(this, null)")
+          template(slot="title" scope="props") Quality: {{props.item.name}}
+          template(slot="details" scope="props")
+            div Cost: {{props.item.cost}}
+      .section(v-if="ship.bays.length > 0")
+        h2.title Expansion Bays
+        stat-block(v-for="(bay, index) in ship.bays" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
+          template(slot="title" scope="props") {{props.item.name}}
+          template(slot="details" scope="props")
+            div {{props.item.details}}
+            div Cost: {{props.item.cost}}
+            div PCU: {{props.item.pcu}}
 
 </template>
 <script>
@@ -86,9 +103,11 @@
   import FramePicker from '~/components/frame-picker'
   import ComputerPicker from '~/components/computer-picker'
   import CrewPicker from '~/components/crew-picker'
+  import DefensesPicker from '~/components/defenses-picker'
+  import BayPicker from '~/components/bay-picker'
   import StatBlock from '~/components/stat-block'
   import Vue from 'vue'
-  import { mapState, mapMutations, mapGetters } from 'vuex'
+  import { mapState, mapMutations, mapGetters, mapActions } from 'vuex'
   export default {
     data: () => ({
       initialPilotSkill: 0,
@@ -140,6 +159,9 @@
         total -= this.ship.thruster !== null ? this.ship.thruster.cost : 0
         total -= this.ship.computer !== null ? this.ship.computer.cost : 0
         total -= this.ship.crewQuarters !== null ? this.ship.crewQuarters.cost : 0
+        total -= this.ship.defenses !== null ? this.ship.defenses.cost : 0
+        total -= this.ship.armor !== null ? this.ship.armor.cost : 0
+        total -= this.ship.bays.map(b => b !== null ? b.cost : 0).reduce(((b1, b2) =>  b1 + b2), 0)
         return total
       },
       maxHP () {
@@ -156,7 +178,7 @@
         return total
       },
       frameBonus () {
-        if (this.ship.frame === null) return null
+        if (this.ship.frame === null) return 0
         switch (this.ship.frame.size) {
           case 'tiny': return 2
           case 'small': return 1
@@ -175,11 +197,16 @@
           this.setTier(value)
         }
       },
+      maxPCU () {
+        if (this.ship.cores === null) return 0
+        return this.ship.cores.map(c => c === null ? 0 : c.pcu).reduce(((c1, c2) => c1 + c2), 0)
+      },
       availablePCU () {
-        let total = this.ship.cores.map(c => c === null ? 0 : c.pcu).reduce(((c1, c2) => c1 + c2), 0)
-        if (this.ship.thruster !== null) {
-          total -= this.ship.thruster.pcu
-        }
+        let total = this.maxPCU
+        total -= this.ship.thruster !== null ? this.ship.thruster.pcu : 0
+        total -= this.ship.defenses !== null ? this.ship.defenses.pcu : 0
+        total -= this.ship.computer !== null ? this.ship.computer.pcu : 0
+        total -= this.ship.bays.map(b => b !== null ? b.pcu : 0).reduce(((b1, b2) =>  b1 + b2), 0)
         return total
       },
       pickerComp () {
@@ -187,8 +214,11 @@
         return  `${this.picker}-picker`
       },
       targetLockTotal () {
-        let total = 0
+        let total = 10
+        total += this.initialPilotSkill
         total += this.ship.armor !== null ? this.ship.armor.targetLock : 0
+        total += this.ship.defenses !== null ? this.ship.defenses.tl : 0
+        total += this.frameBonus
         return total
       },
       turnDistanceTotal () {
@@ -234,10 +264,18 @@
     },
     methods: {
       ...mapMutations({
+        'setFrame': 'SET_FRAME',
         'setTier': 'SET_TIER',
+        'setCore': 'SET_CORE',
+        'setThruster': 'SET_THRUSTER',
+        'setArmor': 'SET_ARMOR',
+        'setComputer': 'SET_COMPUTER',
+        'setCrew': 'SET_CREW',
+        'setDefenses': 'SET_DEFENSES',
         'setPicker': 'pickerModule/SET_PICKER',
-        'setPickerIndex': 'pickerModule/SET_PICKER_INDEX'
+        'setPickerIndex': 'pickerModule/SET_PICKER_INDEX',
       }),
+      ...mapActions(['clearBay']),
       onPick (picker, index) {
         this.setPicker(picker)
         this.setPickerIndex(index)
@@ -250,6 +288,8 @@
       StatBlock,
       FramePicker,
       ComputerPicker,
+      DefensesPicker,
+      BayPicker,
       CrewPicker
     }
   }

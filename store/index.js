@@ -11,23 +11,71 @@ export const state = () => ({
     defenses: null,
     crewQuarters: null,
     bays: [],
-    drift: null
+    drift: null,
+    security: [
+      {
+        enabled: false,
+        name: 'Anti-hacking systems'
+      },
+      {
+        enabled: false,
+        upgraded: true,
+        onlyShowAdderWhenUpgraded: true,
+        name: 'Antipersonnel weapon (longarm)',
+        upgradedName: 'Antipersonnel weapon (heavy)',
+        adder: 0
+      },
+      {
+        enabled: false,
+        name: 'Biometric locks',
+      },
+      {
+        enabled: false,
+        name: 'Computer countermeasures',
+      },
+      {
+        enabled: false,
+        name: 'Self-destruct system',
+      }
+    ]
   }
 })
 
 export const getters = {
-  armorCost () {
+  securityCost (state, getters) {
+    return (item) => {
+      switch (item.name) {
+        case 'Anti-hacking systems':
+          return 3          
+        case 'Antipersonnel weapon (longarm)':
+          let total = 0
+          total += item.upgraded ? 5 : 0
+          total += item.adder
+          return total
+        case 'Biometric locks':
+          return 5
+        case 'Computer countermeasures':
+          return  Math.floor(state.ship.tier)
+        case 'Self-destruct system':
+          return 5 * getters.sizeAsNumber(state.ship.frame)
+      }
+    }
+  },
+  sizeAsNumber () {
+    return (frame) => {
+      switch (frame.size) {
+        case 'tiny': return 1
+        case 'small': return 2
+        case 'medium': return 3
+        case 'large': return 4
+        case 'huge': return 5
+        case 'gargantuan': return 6
+      }
+    }
+  },
+  armorCost (_, getters) {
     return (frame, armor) => {
-      const costModifier = (() => {
-        switch (frame.size) {
-          case 'tiny': return 1
-          case 'small': return 2
-          case 'medium': return 3
-          case 'large': return 4
-          case 'huge': return 5
-          case 'gargantuan': return 6
-        }})()
-      return armor.costMultiplier * costModifier
+      return armor.costMultiplier * getters.sizeAsNumber(frame)
     }
   },
   maxPCU (state) {
@@ -82,6 +130,9 @@ export const mutations = {
   },
   SET_DRIFT (state, drift) {
     state.ship.drift = drift
+  },
+  UPDATE_SECURITY (state, { item, newItem }) {
+    Object.assign(item, newItem)
   }
 }
   

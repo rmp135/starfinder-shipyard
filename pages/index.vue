@@ -46,6 +46,10 @@
           div HP Increment: {{props.item.increment}}
     template(v-if="ship.frame !== null")
       .section
+        h2.title Security
+        .columns
+          .column(v-for="(item, index) in ship.security")
+            security-block(:item="item")
         h2.title Cores
         stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
           template(slot="title" scope="props") {{props.item.name}}
@@ -125,6 +129,7 @@
   import DriftPicker from '~/components/drift-picker'
   import BayPicker from '~/components/bay-picker'
   import StatBlock from '~/components/stat-block'
+  import SecurityBlock from '~/components/security-block'
   import Vue from 'vue'
   import { mapState, mapMutations, mapGetters, mapActions } from 'vuex'
   export default {
@@ -135,7 +140,7 @@
     computed: {
       ...mapState(['ship']),
       ...mapState('pickerModule', ['picker', 'pickerIndex']),
-      ...mapGetters(['armorCost', 'maxPCU']),
+      ...mapGetters(['armorCost', 'maxPCU', 'securityCost']),
       stuntChecks () {
         return {
           easy: Math.floor(10 + 2 * this.ship.tier),
@@ -182,6 +187,7 @@
         total -= this.ship.armor !== null ? this.armorCost(this.ship.frame, this.ship.armor) : 0
         total -= this.ship.drift !== null ? this.armorCost(this.ship.frame, this.ship.drift) : 0
         total -= this.ship.bays.map(b => b !== null ? b.cost : 0).reduce(((b1, b2) =>  b1 + b2), 0)
+        total -= this.ship.security.filter(s => s.enabled).map(s => this.securityCost(s)).reduce(((b1, b2) =>  b1 + b2), 0)
         return total
       },
       maxHP () {
@@ -308,7 +314,8 @@
       DefensesPicker,
       BayPicker,
       CrewPicker,
-      DriftPicker
+      DriftPicker,
+      SecurityBlock
     }
   }
 </script>

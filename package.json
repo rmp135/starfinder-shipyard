@@ -1,4 +1,7 @@
 {
+  "name": "starfinder-shipyard",
+  "version": "0.0.1",
+  "license": "MIT",
   "dependencies": {
     "bulma": "^0.5.1",
     "node-sass": "^4.5.3",
@@ -6,6 +9,7 @@
     "pug": "^2.0.0-rc.3",
     "sass-loader": "^6.0.6"
   },
+  "private": true,
   "scripts": {
     "start": "nuxt"
   }

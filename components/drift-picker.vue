@@ -18,18 +18,18 @@
     }),
     computed: {
       ...mapState(['ship']),
-      ...mapGetters(['armorCost'])
+      ...mapGetters(['armorCost', 'maxPCU'])
     },
     methods: {
       ...mapMutations({
         'setDrift': 'SET_DRIFT',
       }),
-      maxSize (bay) {
-        if (bay.sizes === undefined) return '-'
-        return bay.sizes[bay.sizes.length - 1]
+      maxSize (drift) {
+        if (drift.sizes === undefined) return '-'
+        return drift.sizes[drift.sizes.length - 1]
       },
       isValid (drift) {
-        return true
+        return  drift.minPCU <= this.maxPCU
       },
       onDoneClick (drift) {
         this.setDrift(JSON.parse(JSON.stringify(drift)))

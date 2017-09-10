@@ -65,6 +65,30 @@ export default [
     size: 1
   },
   {
+    name: 'Recreation suite (gym)',
+    details: 'Gym.',
+    sizes: ['medium', 'large', 'huge', 'gargantuan'],
+    cost: 1,
+    pcu: 0,
+    size: 1
+  },
+  {
+    name: 'Recreation suite (trivid den)',
+    details: 'Trivid den',
+    sizes: ['medium', 'large', 'huge', 'gargantuan'],
+    cost: 1,
+    pcu: 1,
+    size: 1
+  },
+  {
+    name: 'Recreation suite (HAC)',
+    details: 'Trivid den',
+    sizes: ['medium', 'large', 'huge', 'gargantuan'],
+    cost: 1,
+    pcu: 3,
+    size: 1
+  },
+  {
     name: 'Science Lab',
     details: 'A general lab provides +1 Life Science and Physical Science. A specific Life Science or Physical Science lab provides +2 to the appropriate skill.',
     cost: 1,

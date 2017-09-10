@@ -29,6 +29,10 @@ export const getters = {
         }})()
       return armor.costMultiplier * costModifier
     }
+  },
+  maxPCU (state) {
+    if (state.ship.cores === null) return 0
+    return state.ship.cores.map(c => c === null ? 0 : c.pcu).reduce(((c1, c2) => c1 + c2), 0)
   }
 }
 

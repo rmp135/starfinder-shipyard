@@ -5,7 +5,7 @@
     component(:show="pickerComp !== null" :is="pickerComp")
     template(v-if="ship.frame !== null")
       .section
-        label.label Pilot
+        label.label Piloting Skills
         input.input(type="number"  v-model.number="initialPilotSkill")
         label.label Tier
         select.input(v-model.number="chosenTier")
@@ -135,7 +135,7 @@
     computed: {
       ...mapState(['ship']),
       ...mapState('pickerModule', ['picker', 'pickerIndex']),
-      ...mapGetters(['armorCost']),
+      ...mapGetters(['armorCost', 'maxPCU']),
       stuntChecks () {
         return {
           easy: Math.floor(10 + 2 * this.ship.tier),
@@ -216,10 +216,6 @@
         set (value) {
           this.setTier(value)
         }
-      },
-      maxPCU () {
-        if (this.ship.cores === null) return 0
-        return this.ship.cores.map(c => c === null ? 0 : c.pcu).reduce(((c1, c2) => c1 + c2), 0)
       },
       availablePCU () {
         let total = this.maxPCU

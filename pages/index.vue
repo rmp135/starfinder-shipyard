@@ -1,31 +1,39 @@
 <style lang="scss">
 </style>
 <template lang="pug">
-  div
+  .container
     component(:show="pickerComp !== null" :is="pickerComp")
-    .section
-      .section(v-if="ship.frame !== null")
-        div Pilot
-        input(type="number"  v-model.number="initialPilotSkill")
-        div Tier
-        select(v-model.number="chosenTier")
+    template(v-if="ship.frame !== null")
+      .section
+        label.label Pilot
+        input.input(type="number"  v-model.number="initialPilotSkill")
+        label.label Tier
+        select.input(v-model.number="chosenTier")
           option(v-for="tier in tiers") {{tier}}
-        .columns
-          .column
-            div HP: {{maxHP}}
-            div Maneuverability: {{ship.frame.maneuverability}} (turn {{turnDistanceTotal}})
-            div Piloting Check Bonus: {{pilotCheckTotal}}
-            div Target Lock: {{targetLockTotal}}
-            div Total AC: {{totalAC}}
-            div Available Build Points: {{availableBuildPoints}} / {{maxBuildPoints}}
-            div Available PCU: {{availablePCU}} / {{maxPCU}}
-          .column
-            div Back Off: DC{{stuntChecks.easy}}
-            div Barrel Roll: DC{{stuntChecks.easy}}
-            div Evade: DC{{stuntChecks.easy}}
-            div Flip and Burn: DC{{stuntChecks.medium}}
-            div Flyby: DC{{stuntChecks.hard}}
-            div Slide: DC{{stuntChecks.easy}}
+      .columns.section
+        .column
+          .card
+            .card-header
+              .card-header-title Key Totals
+            .card-content
+              div HP: {{maxHP}}
+              div Maneuverability: {{ship.frame.maneuverability}} (turn {{turnDistanceTotal}})
+              div Piloting Check Bonus: {{pilotCheckTotal}}
+              div Target Lock: {{targetLockTotal}}
+              div Total AC: {{totalAC}}
+              div Available Build Points: {{availableBuildPoints}} / {{maxBuildPoints}}
+              div Available PCU: {{availablePCU}} / {{maxPCU}}
+        .column
+          .card
+            .card-header
+              p.card-header-title Skill Checks
+            .card-content
+              div Back Off: DC{{stuntChecks.easy}}
+              div Barrel Roll: DC{{stuntChecks.easy}}
+              div Evade: DC{{stuntChecks.easy}}
+              div Flip and Burn: DC{{stuntChecks.medium}}
+              div Flyby: DC{{stuntChecks.hard}}
+              div Slide: DC{{stuntChecks.easy}}
         
     .section
       h2.title Frame
@@ -81,11 +89,21 @@
                 div PCU: {{props.item.pcu}}
                 div TL Bonus: {{props.item.tl}}
       .section(v-if="hasCrewQuarters")
-        h2.title Crew Quarters
-        stat-block(:item="ship.crewQuarters" :type="'crew quarters'" :onPick="onPick.bind(this, 'crew')" :onClear="setCrew.bind(this, null)")
-          template(slot="title" scope="props") Quality: {{props.item.name}}
-          template(slot="details" scope="props")
-            div Cost: {{props.item.cost}}
+        .columns
+          .column
+            h2.title Crew Quarters
+            stat-block(:item="ship.crewQuarters" :type="'crew quarters'" :onPick="onPick.bind(this, 'crew')" :onClear="setCrew.bind(this, null)")
+              template(slot="title" scope="props") Quality: {{props.item.name}}
+              template(slot="details" scope="props")
+                div Cost: {{props.item.cost}}
+          .column
+            h2.title Drift
+            stat-block(:item="ship.drift" :type="'drift engine'" :onPick="onPick.bind(this, 'drift')" :onClear="setDrift.bind(this, null)")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div Engine Rating: {{props.item.rating}}
+                div Min PCU: {{props.item.minPCU}}
+                div Cost: {{armorCost(ship.frame, props.item)}}
       .section(v-if="ship.bays.length > 0")
         h2.title Expansion Bays
         stat-block(v-for="(bay, index) in ship.bays" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
@@ -104,6 +122,7 @@
   import ComputerPicker from '~/components/computer-picker'
   import CrewPicker from '~/components/crew-picker'
   import DefensesPicker from '~/components/defenses-picker'
+  import DriftPicker from '~/components/drift-picker'
   import BayPicker from '~/components/bay-picker'
   import StatBlock from '~/components/stat-block'
   import Vue from 'vue'
@@ -160,7 +179,8 @@
         total -= this.ship.computer !== null ? this.ship.computer.cost : 0
         total -= this.ship.crewQuarters !== null ? this.ship.crewQuarters.cost : 0
         total -= this.ship.defenses !== null ? this.ship.defenses.cost : 0
-        total -= this.ship.armor !== null ? this.ship.armor.cost : 0
+        total -= this.ship.armor !== null ? this.armorCost(this.ship.frame, this.ship.armor) : 0
+        total -= this.ship.drift !== null ? this.armorCost(this.ship.frame, this.ship.drift) : 0
         total -= this.ship.bays.map(b => b !== null ? b.cost : 0).reduce(((b1, b2) =>  b1 + b2), 0)
         return total
       },
@@ -272,6 +292,7 @@
         'setComputer': 'SET_COMPUTER',
         'setCrew': 'SET_CREW',
         'setDefenses': 'SET_DEFENSES',
+        'setDrift': 'SET_DRIFT',
         'setPicker': 'pickerModule/SET_PICKER',
         'setPickerIndex': 'pickerModule/SET_PICKER_INDEX',
       }),
@@ -290,7 +311,8 @@
       ComputerPicker,
       DefensesPicker,
       BayPicker,
-      CrewPicker
+      CrewPicker,
+      DriftPicker
     }
   }
 </script>

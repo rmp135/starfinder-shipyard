@@ -10,7 +10,8 @@ export const state = () => ({
     computer: null,
     defenses: null,
     crewQuarters: null,
-    bays: []
+    bays: [],
+    drift: null
   }
 })
 
@@ -26,7 +27,7 @@ export const getters = {
           case 'huge': return 5
           case 'gargantuan': return 6
         }})()
-      return armor.cost * costModifier
+      return armor.costMultiplier * costModifier
     }
   }
 }
@@ -74,6 +75,9 @@ export const mutations = {
   },
   SET_BAY (state, { bay, index }) {
     Vue.set(state.ship.bays, index, bay)
+  },
+  SET_DRIFT (state, drift) {
+    state.ship.drift = drift
   }
 }
   

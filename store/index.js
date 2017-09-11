@@ -19,7 +19,7 @@ export const state = () => ({
       },
       {
         enabled: false,
-        upgraded: true,
+        upgraded: false,
         onlyShowAdderWhenUpgraded: true,
         name: 'Antipersonnel weapon (longarm)',
         upgradedName: 'Antipersonnel weapon (heavy)',

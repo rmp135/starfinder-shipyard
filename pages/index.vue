@@ -43,7 +43,7 @@
           div Size: {{props.item.size}}
           div Maneuverability: {{props.item.maneuverability}}
           div Max HP: {{props.item.hp.max}}
-          div HP Increment: {{props.item.increment}}
+          div HP Increment: {{props.item.hp.increment}}
     template(v-if="ship.frame !== null")
       .section
         h2.title Security

@@ -48,8 +48,13 @@
       .section
         h2.title Security
         .columns
-          .column(v-for="(item, index) in ship.security")
-            security-block(:item="item")
+          template(v-if="hasCores")
+            .column(v-for="(item, index) in ship.security")
+              security-block(:item="item")
+          .column(v-else)
+              .card
+                .card-content 
+                  .content You must have a core to equip security modules.
         h2.title Cores
         stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
           template(slot="title" scope="props") {{props.item.name}}
@@ -140,7 +145,7 @@
     computed: {
       ...mapState(['ship']),
       ...mapState('pickerModule', ['picker', 'pickerIndex']),
-      ...mapGetters(['armorCost', 'maxPCU', 'securityCost']),
+      ...mapGetters(['armorCost', 'maxPCU', 'securityCost', 'hasCores']),
       stuntChecks () {
         return {
           easy: Math.floor(10 + 2 * this.ship.tier),
@@ -288,7 +293,6 @@
       ...mapMutations({
         'setFrame': 'SET_FRAME',
         'setTier': 'SET_TIER',
-        'setCore': 'SET_CORE',
         'setThruster': 'SET_THRUSTER',
         'setArmor': 'SET_ARMOR',
         'setComputer': 'SET_COMPUTER',
@@ -298,7 +302,7 @@
         'setPicker': 'pickerModule/SET_PICKER',
         'setPickerIndex': 'pickerModule/SET_PICKER_INDEX',
       }),
-      ...mapActions(['clearBay']),
+      ...mapActions(['clearBay', 'setCore']),
       onPick (picker, index) {
         this.setPicker(picker)
         this.setPickerIndex(index)

@@ -81,7 +81,10 @@ export const getters = {
   maxPCU (state) {
     if (state.ship.cores === null) return 0
     return state.ship.cores.map(c => c === null ? 0 : c.pcu).reduce(((c1, c2) => c1 + c2), 0)
-  }
+  },
+  hasCores (state) {
+    return state.ship.cores.filter(c => c !== null).length > 0
+  },
 }
 
 export const mutations = {
@@ -148,5 +151,11 @@ export const actions = {
       commit('ADD_CORE')
     }
     commit('SET_BAY', { bay, index })
+  },
+  setCore ({ state, commit, getters }, { core, index }) {
+    commit('SET_CORE', { core, index })
+    if (!getters.hasCores) {
+      state.ship.security.forEach(s => commit('UPDATE_SECURITY', { item: s, newItem: { enabled: false }}))
+    }
   }
 }

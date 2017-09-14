@@ -10,11 +10,11 @@
       .card-content
         .content No {{type}} selected.
     footer.card-footer
-      a.card-footer-item(@click="onPick") Pick {{type}}
-      a.card-footer-item(@click="onClear" v-if="item !== null") Clear {{type}}
+      a.card-footer-item(@click="$emit('pick')") Pick {{type}}
+      a.card-footer-item(@click="$emit('clear')" v-if="item !== null") Clear {{type}}
 </template>
 <script>
   export default {
-    props: ["item", "type", "onPick", "onClear"]
+    props: ["item", "type"]
   }
 </script>

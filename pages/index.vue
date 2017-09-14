@@ -37,7 +37,7 @@
         
     .section
       h2.title Frame
-      stat-block(:item="ship.frame" :type="'frame'" :onPick="onPick.bind(this, 'frame')" :onClear="setFrame.bind(this, null)")
+      stat-block(:item="ship.frame" :type="'frame'" @pick="onPick('frame')" @clear="setFrame(null)")
         template(slot="title" scope="props") {{props.item.name}}
         template(slot="details" scope="props")
           div Size: {{props.item.size}}
@@ -50,7 +50,7 @@
         h2.title Cores
         .columns
           .column(v-for="(core, index) in ship.cores")
-            stat-block(:type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
+            stat-block(:type="'core'" :item="core" @pick="onPick('power', index)" @clear="setCore({ core: null, index })")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div PCU: {{props.item.pcu}}
@@ -69,7 +69,7 @@
         .columns
           .column
             h2.title Thrusters
-            stat-block(:item="ship.thruster" :type="'thruster'" :onPick="onPick.bind(this, 'thruster')" :onClear="setThruster.bind(this, null)")
+            stat-block(:item="ship.thruster" :type="'thruster'" @pick="onPick('thruster')" @clear="setThruster(null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Speed: {{props.item.speed}}
@@ -77,7 +77,7 @@
                 div Cost: {{props.item.cost}}
           .column
             h2.title Armor
-            stat-block(:item="ship.armor" :type="'armor'" :onPick="onPick.bind(this, 'armor')" :onClear="setArmor.bind(this, null)")
+            stat-block(:item="ship.armor" :type="'armor'" @pick="onPick('armor')" @clear="setArmor(null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Bonus to AC: {{props.item.ac}}
@@ -86,7 +86,7 @@
                 div Cost: {{armorCost(ship.frame, props.item)}}
           .column
             h2.title Computer
-            stat-block(:item="ship.computer" :type="'computer'" :onPick="onPick.bind(this, 'computer')" :onClear="setComputer.bind(this, null)")
+            stat-block(:item="ship.computer" :type="'computer'" @pick="onPick('computer')" @clear="setComputer(null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Bonus to Combat Check: {{props.item.bonus}}
@@ -95,7 +95,7 @@
                 div Cost: {{props.item.cost}}
           .column
             h2.title Defenses
-            stat-block(:item="ship.defenses" :type="'defensive countermeasures'" :onPick="onPick.bind(this, 'defenses')" :onClear="setDefenses.bind(this, null)")
+            stat-block(:item="ship.defenses" :type="'defensive countermeasures'" @pick="onPick('defenses')" @clear="setDefenses(null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Cost: {{props.item.cost}}
@@ -105,13 +105,13 @@
         .columns
           .column
             h2.title Crew Quarters
-            stat-block(:item="ship.crewQuarters" :type="'crew quarters'" :onPick="onPick.bind(this, 'crew')" :onClear="setCrew.bind(this, null)")
+            stat-block(:item="ship.crewQuarters" :type="'crew quarters'" @pick="onPick('crew')" @clear="setCrew(null)")
               template(slot="title" scope="props") Quality: {{props.item.name}}
               template(slot="details" scope="props")
                 div Cost: {{props.item.cost}}
           .column
             h2.title Drift
-            stat-block(:item="ship.drift" :type="'drift engine'" :onPick="onPick.bind(this, 'drift')" :onClear="setDrift.bind(this, null)")
+            stat-block(:item="ship.drift" :type="'drift engine'" @pick="onPick('drift')" @clear="setDrift(null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Engine Rating: {{props.item.rating}}
@@ -119,7 +119,7 @@
                 div Cost: {{armorCost(ship.frame, props.item)}}
           .column
             h2.title Shields
-            stat-block(:item="ship.shields" :type="'shields'" :onPick="onPick.bind(this, 'shields')" :onClear="setShields.bind(this, null)")
+            stat-block(:item="ship.shields" :type="'shields'" @pick="onPick('shields')" @clear="setShields(null)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div Cost: {{props.item.cost}}
@@ -130,14 +130,14 @@
         h2.title Expansion Bays
         .columns
           .column
-            stat-block(v-for="(bay, index) in ship.bays" v-if="index % 3 === 0" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
+            stat-block(v-for="(bay, index) in ship.bays" v-if="index % 3 === 0" :item="bay" :type="'expansion bay'" @pick="onPick('bay', index)" @clear="clearBay(index)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div {{props.item.details}}
                 div Cost: {{props.item.cost}}
                 div PCU: {{props.item.pcu}}
           .column
-            stat-block(v-for="(bay, index) in ship.bays" v-if="(index - 1) % 3 === 0" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
+            stat-block(v-for="(bay, index) in ship.bays" v-if="(index - 1) % 3 === 0" :item="bay" :type="'expansion bay'" @pick="onPick('bay', index)" @clear="clearBay(index)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div {{props.item.details}}
@@ -145,7 +145,7 @@
                 div PCU: {{props.item.pcu}}
 
           .column
-            stat-block(v-for="(bay, index) in ship.bays" v-if="(index - 2) % 3 === 0" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
+            stat-block(v-for="(bay, index) in ship.bays" v-if="(index - 2) % 3 === 0" :item="bay" :type="'expansion bay'" @pick="onPick('bay', index)" @clear="clearBay(index)")
               template(slot="title" scope="props") {{props.item.name}}
               template(slot="details" scope="props")
                 div {{props.item.details}}

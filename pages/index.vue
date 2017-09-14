@@ -338,7 +338,9 @@
       ...mapActions(['clearBay', 'setCore']),
       onPick (picker, index) {
         this.setPicker(picker)
-        this.setPickerIndex(index)
+        if (index !== undefined) {
+          this.setPickerIndex(index)
+        }
       }
     },
     components: {

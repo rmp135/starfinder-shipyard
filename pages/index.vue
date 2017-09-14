@@ -44,6 +44,7 @@
           div Maneuverability: {{props.item.maneuverability}}
           div Max HP: {{props.item.hp.max}}
           div HP Increment: {{props.item.hp.increment}}
+          div Cost: {{props.item.cost}}
     template(v-if="ship.frame !== null")
       .section
         h2.title Cores

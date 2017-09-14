@@ -46,6 +46,13 @@
           div HP Increment: {{props.item.hp.increment}}
     template(v-if="ship.frame !== null")
       .section
+        h2.title Cores
+        stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
+          template(slot="title" scope="props") {{props.item.name}}
+          template(slot="details" scope="props")
+            div PCU: {{props.item.pcu}}
+            div Cost: {{props.item.cost}}
+      .section
         h2.title Security
         .columns
           template(v-if="hasCores")
@@ -55,12 +62,6 @@
               .card
                 .card-content 
                   .content You must have a core to equip security modules.
-        h2.title Cores
-        stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
-          template(slot="title" scope="props") {{props.item.name}}
-          template(slot="details" scope="props")
-            div PCU: {{props.item.pcu}}
-            div Cost: {{props.item.cost}}
       .section
         .columns
           .column

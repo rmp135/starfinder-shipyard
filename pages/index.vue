@@ -116,6 +116,15 @@
                 div Engine Rating: {{props.item.rating}}
                 div Min PCU: {{props.item.minPCU}}
                 div Cost: {{armorCost(ship.frame, props.item)}}
+          .column
+            h2.title Shields
+            stat-block(:item="ship.shields" :type="'shields'" :onPick="onPick.bind(this, 'shields')" :onClear="setShields.bind(this, null)")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div Cost: {{props.item.cost}}
+                div PCU: {{props.item.pcu}}
+                div Shield Points: {{props.item.points}}
+                div Regen: {{props.item.regen}}/min
       .section(v-if="ship.bays.length > 0")
         h2.title Expansion Bays
         .columns
@@ -152,6 +161,7 @@
   import DefensesPicker from '~/components/defenses-picker'
   import DriftPicker from '~/components/drift-picker'
   import BayPicker from '~/components/bay-picker'
+  import ShieldsPicker from '~/components/shields-picker'
   import StatBlock from '~/components/stat-block'
   import SecurityBlock from '~/components/security-block'
   import Vue from 'vue'
@@ -212,6 +222,7 @@
         total -= this.ship.drift !== null ? this.armorCost(this.ship.frame, this.ship.drift) : 0
         total -= this.ship.bays.map(b => b !== null ? b.cost : 0).reduce(((b1, b2) =>  b1 + b2), 0)
         total -= this.ship.security.filter(s => s.enabled).map(s => this.securityCost(s)).reduce(((b1, b2) =>  b1 + b2), 0)
+        total -= this.ship.shields !== null ? this.ship.shields.cost : 0
         return total
       },
       maxHP () {
@@ -253,6 +264,7 @@
         total -= this.ship.defenses !== null ? this.ship.defenses.pcu : 0
         total -= this.ship.computer !== null ? this.ship.computer.pcu : 0
         total -= this.ship.bays.map(b => b !== null ? b.pcu : 0).reduce(((b1, b2) =>  b1 + b2), 0)
+        total -= this.ship.shields !== null ? this.ship.shields.pcu : 0
         return total
       },
       pickerComp () {
@@ -318,6 +330,7 @@
         'setCrew': 'SET_CREW',
         'setDefenses': 'SET_DEFENSES',
         'setDrift': 'SET_DRIFT',
+        'setShields': 'SET_SHIELDS',
         'setPicker': 'pickerModule/SET_PICKER',
         'setPickerIndex': 'pickerModule/SET_PICKER_INDEX',
       }),
@@ -338,6 +351,7 @@
       BayPicker,
       CrewPicker,
       DriftPicker,
+      ShieldsPicker,
       SecurityBlock
     }
   }

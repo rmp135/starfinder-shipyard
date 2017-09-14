@@ -47,11 +47,13 @@
     template(v-if="ship.frame !== null")
       .section
         h2.title Cores
-        stat-block(v-for="(core, index) in ship.cores" :type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
-          template(slot="title" scope="props") {{props.item.name}}
-          template(slot="details" scope="props")
-            div PCU: {{props.item.pcu}}
-            div Cost: {{props.item.cost}}
+        .columns
+          .column(v-for="(core, index) in ship.cores")
+            stat-block(:type="'core'" :item="core" :onPick="onPick.bind(this, 'power', index)" :onClear="setCore.bind(this, { core: null, index })")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div PCU: {{props.item.pcu}}
+                div Cost: {{props.item.cost}}
       .section
         h2.title Security
         .columns
@@ -116,13 +118,29 @@
                 div Cost: {{armorCost(ship.frame, props.item)}}
       .section(v-if="ship.bays.length > 0")
         h2.title Expansion Bays
-        stat-block(v-for="(bay, index) in ship.bays" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
-          template(slot="title" scope="props") {{props.item.name}}
-          template(slot="details" scope="props")
-            div {{props.item.details}}
-            div Cost: {{props.item.cost}}
-            div PCU: {{props.item.pcu}}
+        .columns
+          .column
+            stat-block(v-for="(bay, index) in ship.bays" v-if="index % 3 === 0" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div {{props.item.details}}
+                div Cost: {{props.item.cost}}
+                div PCU: {{props.item.pcu}}
+          .column
+            stat-block(v-for="(bay, index) in ship.bays" v-if="(index - 1) % 3 === 0" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div {{props.item.details}}
+                div Cost: {{props.item.cost}}
+                div PCU: {{props.item.pcu}}
 
+          .column
+            stat-block(v-for="(bay, index) in ship.bays" v-if="(index - 2) % 3 === 0" :item="bay" :type="'expansion bay'" :onPick="onPick.bind(this, 'bay', index)" :onClear="clearBay.bind(this, index)")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div {{props.item.details}}
+                div Cost: {{props.item.cost}}
+                div PCU: {{props.item.pcu}}
 </template>
 <script>
   import PowerPicker from '~/components/power-picker'

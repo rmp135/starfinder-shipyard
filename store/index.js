@@ -13,6 +13,7 @@ export const state = () => ({
     bays: [],
     drift: null,
     shields: null,
+    sensor: null,
     security: [
       {
         enabled: false,
@@ -138,9 +139,11 @@ export const mutations = {
   UPDATE_SECURITY (state, { item, newItem }) {
     Object.assign(item, newItem)
   },
-
   SET_SHIELDS (state, shields) {
     state.ship.shields = shields
+  },
+  SET_SENSOR(state, sensor) {
+    state.ship.sensor = sensor
   }
 }
   

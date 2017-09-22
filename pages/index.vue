@@ -56,6 +56,14 @@
                 div PCU: {{props.item.pcu}}
                 div Cost: {{props.item.cost}}
       .section
+        h2.title Thrusters
+        stat-block(:item="ship.thruster" :type="'thruster'" @pick="onPick('thruster')" @clear="setThruster(null)")
+          template(slot="title" scope="props") {{props.item.name}}
+          template(slot="details" scope="props")
+            div Speed: {{props.item.speed}}
+            div PCU: {{props.item.pcu}}
+            div Cost: {{props.item.cost}}
+      .section
         h2.title Security
         .columns
           template(v-if="hasCores")
@@ -67,14 +75,6 @@
                   .content You must have a core to equip security modules.
       .section
         .columns
-          .column
-            h2.title Thrusters
-            stat-block(:item="ship.thruster" :type="'thruster'" @pick="onPick('thruster')" @clear="setThruster(null)")
-              template(slot="title" scope="props") {{props.item.name}}
-              template(slot="details" scope="props")
-                div Speed: {{props.item.speed}}
-                div PCU: {{props.item.pcu}}
-                div Cost: {{props.item.cost}}
           .column
             h2.title Armor
             stat-block(:item="ship.armor" :type="'armor'" @pick="onPick('armor')" @clear="setArmor(null)")
@@ -109,6 +109,19 @@
               template(slot="title" scope="props") Quality: {{props.item.name}}
               template(slot="details" scope="props")
                 div Cost: {{props.item.cost}}
+      .section
+        .columns
+          .column
+            h2.title Sensors
+            stat-block(v-if="hasCores" :item="ship.sensor" :type="'sensors'" @pick="onPick('sensor')" @clear="setSensor(null)")
+              template(slot="title" scope="props") {{props.item.name}}
+              template(slot="details" scope="props")
+                div Range: {{props.item.range}}
+                div Perception Modifier: {{props.item.modifier}}
+                div Cost: {{props.item.cost}}
+            .card(v-else)
+              .card-content 
+                .content You must have a core to equip security modules.
           .column
             h2.title Drift
             stat-block(:item="ship.drift" :type="'drift engine'" @pick="onPick('drift')" @clear="setDrift(null)")
@@ -143,7 +156,6 @@
                 div {{props.item.details}}
                 div Cost: {{props.item.cost}}
                 div PCU: {{props.item.pcu}}
-
           .column
             stat-block(v-for="(bay, index) in ship.bays" v-if="(index - 2) % 3 === 0" :item="bay" :type="'expansion bay'" @pick="onPick('bay', index)" @clear="clearBay(index)")
               template(slot="title" scope="props") {{props.item.name}}
@@ -163,6 +175,7 @@
   import DriftPicker from '~/components/drift-picker'
   import BayPicker from '~/components/bay-picker'
   import ShieldsPicker from '~/components/shields-picker'
+  import SensorPicker from '~/components/sensor-picker'
   import StatBlock from '~/components/stat-block'
   import SecurityBlock from '~/components/security-block'
   import Vue from 'vue'
@@ -223,6 +236,7 @@
         total -= this.ship.drift !== null ? this.armorCost(this.ship.frame, this.ship.drift) : 0
         total -= this.ship.bays.map(b => b !== null ? b.cost : 0).reduce(((b1, b2) =>  b1 + b2), 0)
         total -= this.ship.security.filter(s => s.enabled).map(s => this.securityCost(s)).reduce(((b1, b2) =>  b1 + b2), 0)
+        total -= this.ship.sensor !== null ? this.ship.sensor.cost : 0
         total -= this.ship.shields !== null ? this.ship.shields.cost : 0
         return total
       },
@@ -332,6 +346,7 @@
         'setDefenses': 'SET_DEFENSES',
         'setDrift': 'SET_DRIFT',
         'setShields': 'SET_SHIELDS',
+        'setSensor': 'SET_SENSOR',
         'setPicker': 'pickerModule/SET_PICKER',
         'setPickerIndex': 'pickerModule/SET_PICKER_INDEX',
       }),
@@ -355,6 +370,7 @@
       CrewPicker,
       DriftPicker,
       ShieldsPicker,
+      SensorPicker,
       SecurityBlock
     }
   }
